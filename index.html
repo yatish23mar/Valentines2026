@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My One & Only ❤️</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1a1a1a, #2a0a1f, #3b0a2a);
+  background-size: 400% 400%;
+  animation: subtleFlow 18s ease infinite;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+@keyframes subtleFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1;
+  transition: opacity 1.2s ease;
+}
+
+.hidden {
+  display: none;
+}
+
+h1 {
+  font-size: 2.8rem;
+  margin-bottom: 40px;
+}
+
+button {
+  padding: 14px 30px;
+  font-size: 18px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  margin: 10px;
+  transition: transform 0.3s ease;
+}
+
+#yes { background: #e60073; color: white; }
+#no { background: #444; color: white; position: relative; }
+
+.headline {
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 1.8s ease;
+}
+
+.headline.show {
+  opacity: 1;
+  transform: translateY(0);
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%,100% { text-shadow: 0 0 10px #ff4da6; }
+  50% { text-shadow: 0 0 25px #ff99cc; }
+}
+
+.highlight { color: #ff4da6; }
+
+.slideshow img {
+  width: 280px;
+  height: 380px;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  animation: slowZoom 6s ease-in-out infinite alternate;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.slideshow img.show { opacity: 1; }
+
+@keyframes slowZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- PAGE 1 -->
+<div class="page" id="page1">
+  <h1>Will You Be My Valentine? ❤️</h1>
+  <div>
+    <button id="yes">Yes ❤️</button>
+    <button id="no">No 🙈</button>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page hidden" id="page2">
+  <div class="headline" id="headline">
+    Is Dil Ki Film Mein… Lead Role Hamesha Tumhara Hi Rahega —
+    <span class="highlight">Meri Zindagi Ki One & Only Heroine</span> ❤️🎬✨
+  </div>
+  <div class="slideshow">
+    <img id="slide" src="photo1.jpg">
+  </div>
+</div>
+
+<!-- ANNIVERSARY PAGE -->
+<div class="page hidden" id="anniversaryPage">
+  <h1>Since 17th December, 2023 💍</h1>
+  <p style="opacity:0.8; font-size:1.2rem; margin-top:10px;">
+    The day our forever officially began ✨
+  </p>
+</div>
+
+<audio id="music" src="srk_instrumental.mp3" loop></audio>
+
+<script>
+
+// PARTICLES
+var canvas = document.getElementById("particles");
+var ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+var particles = [];
+for (var i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2 + 1,
+    speed: Math.random() * 0.5 + 0.2
+  });
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "rgba(255,255,255,0.4)";
+  particles.forEach(function(p) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fill();
+    p.y -= p.speed;
+    if (p.y < 0) p.y = canvas.height;
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// MISCHIEF
+var noBtn = document.getElementById("no");
+var yesBtn = document.getElementById("yes");
+var noClickCount = 0;
+
+noBtn.addEventListener("mouseover", function() {
+  this.style.position = "absolute";
+  this.style.left = Math.random() * (window.innerWidth - 120) + "px";
+  this.style.top = Math.random() * (window.innerHeight - 80) + "px";
+});
+
+noBtn.addEventListener("click", function() {
+  noClickCount++;
+  this.style.transform = "scale(" + (1 - noClickCount * 0.1) + ")";
+  yesBtn.style.transform = "scale(" + (1 + noClickCount * 0.15) + ")";
+});
+
+// YES FLOW
+yesBtn.addEventListener("click", function() {
+
+  document.getElementById("page1").classList.add("hidden");
+  document.getElementById("page2").classList.remove("hidden");
+
+  startMusic();
+  startSlideshow();
+
+  setTimeout(function() {
+    document.getElementById("headline").classList.add("show");
+    document.getElementById("slide").classList.add("show");
+  }, 600);
+
+  // Move to anniversary page after 15 sec
+  setTimeout(function() {
+    document.getElementById("page2").classList.add("hidden");
+    document.getElementById("anniversaryPage").classList.remove("hidden");
+  }, 15000);
+});
+
+// MUSIC
+function startMusic() {
+  var music = document.getElementById("music");
+  music.volume = 0.6;
+  music.play().catch(function(){});
+}
+
+// SLIDESHOW
+var images = ["photo1.jpg", "photo2.jpg", "photo3.jpg"];
+var index = 0;
+
+function startSlideshow() {
+  var slide = document.getElementById("slide");
+
+  setInterval(function() {
+    slide.classList.remove("show");
+    setTimeout(function() {
+      index = (index + 1) % images.length;
+      slide.src = images[index];
+      slide.classList.add("show");
+    }, 600);
+  }, 4000);
+}
+
+</script>
+
+</body>
+</html>
