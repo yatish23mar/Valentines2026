@@ -1,28 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>For My One & Only ❤️</title>
 
 <style>
-body {
+/* Base layout */
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: 'Segoe UI', sans-serif;
+  color: white;
+  text-align: center;
   background: linear-gradient(135deg, #1a1a1a, #2a0a1f, #3b0a2a);
   background-size: 400% 400%;
   animation: subtleFlow 18s ease infinite;
-  color: white;
-  text-align: center;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
+  position: relative;
 }
 
+/* Animated background gradient */
 @keyframes subtleFlow {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
+/* Particles canvas */
 canvas {
   position: fixed;
   inset: 0;
@@ -30,42 +37,49 @@ canvas {
   z-index: 0;
 }
 
+/* Page containers */
 .page {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 20px;
-  z-index: 1;
   transition: opacity 1.2s ease;
+  z-index: 1;
 }
 
 .hidden {
   display: none;
 }
 
+/* Heading styles */
 h1 {
-  font-size: 2.8rem;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
   margin-bottom: 40px;
+  z-index: 2;
+  position: relative;
+  text-shadow: 0 0 8px #ff4da6;
 }
 
+/* Buttons */
 button {
-  padding: 14px 30px;
-  font-size: 18px;
+  padding: 10px 24px;
+  font-size: clamp(1rem, 3vw, 1.2rem);
   border-radius: 30px;
   border: none;
   cursor: pointer;
   margin: 10px;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, background 0.3s ease;
 }
 
 #yes { background: #e60073; color: white; }
 #no { background: #444; color: white; position: relative; }
 
+/* Headline typing text */
 .headline {
-  font-size: 2.2rem;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
   margin-bottom: 30px;
   opacity: 0;
   transform: translateY(20px);
@@ -85,15 +99,17 @@ button {
 
 .highlight { color: #ff4da6; }
 
+/* Slideshow */
 .slideshow img {
-  width: 280px;
-  height: 380px;
+  width: clamp(200px, 60vw, 300px);
+  height: auto;
   object-fit: cover;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.6);
   animation: slowZoom 6s ease-in-out infinite alternate;
   opacity: 0;
   transition: opacity 1s ease;
+  z-index: 1;
 }
 
 .slideshow img.show { opacity: 1; }
@@ -103,6 +119,13 @@ button {
   to { transform: scale(1.08); }
 }
 
+/* Floating hearts animation */
+@keyframes floatUp {
+  to {
+    transform: translateY(-110vh);
+    opacity: 0;
+  }
+}
 </style>
 </head>
 
@@ -121,12 +144,9 @@ button {
 
 <!-- PAGE 2 -->
 <div class="page hidden" id="page2">
-  <div class="headline" id="headline">
-    Is Dil Ki Film Mein… Lead Role Hamesha Tumhara Hi Rahega —
-    <span class="highlight">Meri Zindagi Ki One & Only Heroine</span> ❤️🎬✨
-  </div>
+  <div class="headline" id="headline"></div>
   <div class="slideshow">
-    <img id="slide" src="photo1.jpg">
+    <img id="slide" src="photo1.jpg" alt="Our special memory ❤️">
   </div>
 </div>
 
@@ -136,12 +156,12 @@ button {
   <p style="opacity:0.8; font-size:1.2rem; margin-top:10px;">
     The day our forever officially began ✨
   </p>
+  <button onclick="location.reload()">Replay 💞</button>
 </div>
 
 <audio id="music" src="srk_instrumental.mp3" loop></audio>
 
 <script>
-
 // PARTICLES
 var canvas = document.getElementById("particles");
 var ctx = canvas.getContext("2d");
@@ -172,7 +192,7 @@ function animateParticles() {
 }
 animateParticles();
 
-// MISCHIEF
+// MISCHIEF BUTTON
 var noBtn = document.getElementById("no");
 var yesBtn = document.getElementById("yes");
 var noClickCount = 0;
@@ -191,12 +211,15 @@ noBtn.addEventListener("click", function() {
 
 // YES FLOW
 yesBtn.addEventListener("click", function() {
-
   document.getElementById("page1").classList.add("hidden");
   document.getElementById("page2").classList.remove("hidden");
 
   startMusic();
   startSlideshow();
+  typeWriter(
+    Is Dil Ki Film Mein… Lead Role Hamesha Tumhara Hi Rahega — <span class="highlight">Meri Zindagi Ki One & Only Heroine</span> ❤️🎬✨,
+    "headline"
+  );
 
   setTimeout(function() {
     document.getElementById("headline").classList.add("show");
@@ -214,16 +237,23 @@ yesBtn.addEventListener("click", function() {
 function startMusic() {
   var music = document.getElementById("music");
   music.volume = 0.6;
-  music.play().catch(function(){});
+  if (music.paused) {
+    music.play().catch(() => {
+      document.body.addEventListener("click", () => music.play(), { once: true });
+    });
+  }
 }
 
-// SLIDESHOW
+// SLIDESHOW + PRELOAD
 var images = ["photo1.jpg", "photo2.jpg", "photo3.jpg"];
-var index = 0;
+images.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
 
+var index = 0;
 function startSlideshow() {
   var slide = document.getElementById("slide");
-
   setInterval(function() {
     slide.classList.remove("show");
     setTimeout(function() {
@@ -234,6 +264,35 @@ function startSlideshow() {
   }, 4000);
 }
 
+// TYPEWRITER EFFECT
+function typeWriter(text, elementId, speed = 70) {
+  const element = document.getElementById(elementId);
+  element.innerHTML = "";
+  let i = 0;
+  function typing() {
+    if (i < text.length) {
+      element.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+// FLOATING HEARTS
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.innerText = "💖";
+  heart.style.position = "fixed";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.bottom = "-20px";
+  heart.style.fontSize = Math.random() * 24 + 16 + "px";
+  heart.style.animation = "floatUp 6s linear forwards";
+  heart.style.zIndex = "0";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 6000);
+}
+setInterval(createHeart, 800);
 </script>
 
 </body>
